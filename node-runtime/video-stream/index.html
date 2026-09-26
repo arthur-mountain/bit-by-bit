@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>直播 Stream 範例</title>
+  </head>
+  <body>
+    <h1>直播文字串流 (Chunked Transfer Encoding 範例)</h1>
+    <pre id="output"></pre>
+
+    <script>
+      const output = document.getElementById("output");
+
+      fetch("http://localhost:8080")
+        .then((response) => {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+
+          function read() {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                output.textContent += "\n直播結束";
+                return;
+              }
+              // 把接收到的 chunk 轉成文字，顯示在頁面上
+              const text = decoder.decode(value, { stream: true });
+              // console.log({ text, isJSON: typeof text === "string", parsed: JSON.parse(text), });
+              output.textContent += text;
+              read();
+            });
+          }
+
+          read();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    </script>
+  </body>
+</html>

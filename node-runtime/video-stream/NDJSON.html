@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <title>AI 字元串流模擬</title>
+  </head>
+  <body>
+    <h2>AI 模擬輸出：</h2>
+    <pre id="output"></pre>
+
+    <script>
+      const output = document.getElementById("output");
+
+      fetch("http://localhost:8081")
+        .then((response) => {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+
+          let buffer = "";
+
+          function read() {
+            reader.read().then(({ done, value }) => {
+              if (done) return;
+
+              buffer += decoder.decode(value, { stream: true });
+
+              // 拆行處理 NDJSON
+              const lines = buffer.split("\n");
+              buffer = lines.pop(); // 最後一行可能還沒結束，保留等下次讀
+
+              for (const line of lines) {
+                if (line.trim()) {
+                  const json = JSON.parse(line);
+                  if (json.token) {
+                    output.textContent += json.token;
+                  }
+                  if (json.done) {
+                    output.textContent += "\n[✅ 回答結束]";
+                  }
+                }
+              }
+
+              read();
+            });
+          }
+
+          read();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    </script>
+  </body>
+</html>

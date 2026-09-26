@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Worker 組合包 MVP：多分頁協作筆記</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font-family: -apple-system, "Segoe UI", "PingFang TC", "Noto Sans TC",
+          sans-serif;
+        max-width: 760px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        line-height: 1.6;
+      }
+      h1 {
+        font-size: 1.35rem;
+      }
+      section {
+        border: 1px solid #8888;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      h2 {
+        font-size: 1rem;
+        margin-top: 0;
+        opacity: 0.8;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        margin-left: 0.4rem;
+      }
+      .ok {
+        background: #1e7e34;
+        color: #fff;
+      }
+      .warn {
+        background: #b8860b;
+        color: #fff;
+      }
+      .bad {
+        background: #a33;
+        color: #fff;
+      }
+      ul#notes {
+        list-style: none;
+        padding: 0;
+      }
+      ul#notes li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #8884;
+        padding: 0.35rem 0;
+      }
+      ul#notes li button {
+        flex-shrink: 0;
+      }
+      progress {
+        width: 100%;
+        height: 1.1rem;
+      }
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      small.hint {
+        opacity: 0.65;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      Worker 全家桶 MVP：多分頁協作筆記（單一 SharedWorker + OPFS SQLite）
+    </h1>
+
+    <section>
+      <h2>1. Service Worker：離線可用性</h2>
+      <p>狀態：<span id="sw-status">尚未註冊</span></p>
+      <p>網路狀態：<span id="net-status">-</span></p>
+    </section>
+
+    <section>
+      <h2>2. Shared Worker：跨分頁共用同一個 SQLite 連線</h2>
+      <p>
+        目前開啟中的分頁數（同一個 SharedWorker 追蹤）：
+        <strong id="tab-count">-</strong>
+      </p>
+      <p>
+        <small class="hint"
+          >在另一個分頁打開同一個網址，這裡的數字會即時 +1。</small
+        >
+      </p>
+    </section>
+
+    <section>
+      <h2>
+        3. 筆記（實際資料存在 OPFS 上的 SQLite 檔案，經由 SharedWorker
+        集中讀寫）
+      </h2>
+      <textarea id="note-input" rows="2" placeholder="輸入筆記內容"></textarea>
+      <button id="add-note">新增筆記</button>
+      <ul id="notes"></ul>
+    </section>
+
+    <section>
+      <h2>4. Web Worker + SharedArrayBuffer：背景統計不卡住主執行緒</h2>
+      <p>
+        跨來源隔離（crossOriginIsolated，SharedArrayBuffer 可用的前提）：
+        <span id="coi-status">-</span>
+      </p>
+      <button id="run-stats">分析所有筆記的字元頻率</button>
+      <progress id="stats-progress" value="0" max="100"></progress>
+      <pre id="stats-result" style="white-space: pre-wrap"></pre>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

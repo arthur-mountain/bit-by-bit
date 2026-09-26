@@ -1,0 +1,18 @@
+{
+  "name": "worker-family-sqlite-wasm-mvp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MVP demo: Web Worker + Shared Worker + Service Worker + SharedArrayBuffer + SQLite Wasm(OPFS)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@sqlite.org/sqlite-wasm": "^3.50.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.0"
+  }
+}
